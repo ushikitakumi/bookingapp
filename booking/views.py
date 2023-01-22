@@ -80,13 +80,19 @@ def Booking(request,pk,year,month,day,hour):
                 'hour' : hour}
 
     if request.method == 'POST':
-        object = Schedule.objects.create(
-                start = request.POST['start'],
-                end = request.POST['end'],
-                personCount = request.POST['personCount'],
-                user = user.pk,
-                studio = studio.pk)
-        object.save()
+        start_hour = datetime.datetime(year=year, month=month, day=day, hour=int(request.POST['start'].replace(':00','')))
+        end_hour = datetime.datetime(year=year, month=month, day=day, hour=int(request.POST['end'].replace(':00','')))
+
+        if Schedule.objects.filter(studio=studio).exclude(Q(start__gte=end_hour) | Q(end__lte=start_hour)).exists():
+            messages.error(request, 'すでに予約が入っています。別の日時をお選びください')
+        else:
+            object = Schedule.objects.create(
+                    start = start_hour,
+                    end = end_hour,
+                    personCount = request.POST['personCount'],
+                    user = user,
+                    studio = studio)
+            object.save()
         return redirect('booking:calendar', pk=studio.pk, year=year, month=month, day=day)
 
     else:
