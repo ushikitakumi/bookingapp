@@ -51,11 +51,15 @@ class StudioCalendar(generic.TemplateView):
         start_time = datetime.datetime.combine(start_day, datetime.time(hour=9, minute=0, second=0))
         end_time = datetime.datetime.combine(end_day, datetime.time(hour=23, minute=0, second=0))
         for schedule in Schedule.objects.filter(studio=studio).exclude(Q(start__gt=end_time) | Q(end__lt=start_time)):
-            local_dt = timezone.localtime(schedule.start)
-            booking_date = local_dt.date()
-            booking_hour = local_dt.hour 
-            if booking_hour in calendar and booking_date in calendar[booking_hour]:
-                calendar[booking_hour][booking_date] = False
+            start_dt = timezone.localtime(schedule.start)
+            end_dt = timezone.localtime(schedule.end)
+            booking_date = start_dt.date()
+            booking_start_hour = start_dt.hour
+            booking_end_hour = end_dt.hour 
+
+            for hour in range(booking_start_hour,booking_end_hour):
+                if hour in calendar and booking_date in calendar[hour]:
+                    calendar[hour][booking_date] = False
                 
         context['studio'] = studio
         context['calendar'] = calendar
@@ -65,7 +69,6 @@ class StudioCalendar(generic.TemplateView):
         context['before'] = days[0] - datetime.timedelta(days=7)
         context['next'] = days[-1] + datetime.timedelta(days=1)
         context['today'] = today
-        # context['public_holidays'] = settings.PUBLIC_HOLIDAYS
         return context
 
 @login_required
