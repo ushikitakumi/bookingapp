@@ -1,0 +1,34 @@
+{% load static %}
+{% load django_bootstrap5 %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>予約管理システム</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <link rel="stylesheet" href="{% static 'booking/css/style.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand flex-md-row navbar-dark bg-dark">
+        <div class="container justify-content-between">
+            <a href="/" class="navbar-brand">予約管理システム</a>
+            <ul class="navbar-nav mr-md-2">
+                {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">ログアウト</a></li>
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">ログイン</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">会員登録</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    <main>
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+</body>
+</html>
