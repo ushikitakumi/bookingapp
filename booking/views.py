@@ -101,34 +101,10 @@ def Booking(request,pk,year,month,day,hour):
     else:
         return render(request, 'booking/booking.html', context)
 
-# class Booking(LoginRequiredMixin,generic.CreateView):
-#     login_url = '/accounts/login/'
-#     template_name = 'booking/booking.html'
-#     model = Schedule
-#     fields = ['start','end','personCount']
+class StaffListView(generic.ListView):
+    template_name = 'booking/staff.html'
+    model = Studio
 
-#     def get_context_data(self, **kwargs):
-#         context =super().get_context_data(**kwargs)
-#         context['studio'] = get_object_or_404(Studio, pk=self.kwargs['pk'])
-#         context['user'] = self.request.user
-#         return context
+class StaffStudioCalendar(StudioCalendar):
+        template_name = 'booking/calendar.html'
 
-#     def form_valid(self, request, form):
-#         studio = get_object_or_404(Studio, pk=self.kwargs['pk'])
-#         user = self.request.user.id
-#         year = self.kwargs.get('year')
-#         month = self.kwargs.get('month')
-#         day = self.kwargs.get('day')
-        
-#         schedule = form.save(commit=False)
-#         end_r = schedule.end
-#         start_r = schedule.start
-
-#         if Schedule.objects.filter(studio=studio).exclude(Q(start__gt=end_r) | Q(end__lt=start_r)).exists():
-#             messages.error(self.request, 'すでに予約が入っています。別の日時をお選びください')
-
-#         else:
-#             schedule.studio = studio
-#             schedule.user = user
-#             schedule.save()
-#             return redirect('booking:calendar', pk=studio.pk, year=year, month=month, day=day)
