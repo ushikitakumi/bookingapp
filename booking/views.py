@@ -106,5 +106,5 @@ class StaffListView(generic.ListView):
     model = Studio
 
 class StaffStudioCalendar(StudioCalendar):
-        template_name = 'booking/calendar.html'
+    template_name = 'booking/calendar.html'
 
