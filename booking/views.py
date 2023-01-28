@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
 from django.views import generic
 from django.contrib import messages
-# from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, StaffOnly
 from django.contrib.auth.decorators import login_required
 from .models import Studio, Schedule
 import sys
@@ -83,15 +83,15 @@ def Booking(request,pk,year,month,day,hour):
                 'hour' : hour}
 
     if request.method == 'POST':
-        start_hour = datetime.datetime(year=year, month=month, day=day, hour=int(request.POST['start'].replace(':00','')))
-        end_hour = datetime.datetime(year=year, month=month, day=day, hour=int(request.POST['end'].replace(':00','')))
+        start_time = datetime.datetime(year=year, month=month, day=day, hour=int(request.POST['start'].replace(':00','')))
+        end_time = datetime.datetime(year=year, month=month, day=day, hour=int(request.POST['end'].replace(':00','')))
 
-        if Schedule.objects.filter(studio=studio).exclude(Q(start__gte=end_hour) | Q(end__lte=start_hour)).exists():
+        if Schedule.objects.filter(studio=studio).exclude(Q(start__gte=end_time) | Q(end__lte=start_time)).exists():
             messages.error(request, 'すでに予約が入っています。別の日時をお選びください')
         else:
             object = Schedule.objects.create(
-                    start = start_hour,
-                    end = end_hour,
+                    start = start_time,
+                    end = end_time,
                     personCount = request.POST['personCount'],
                     user = user,
                     studio = studio)
@@ -101,10 +101,39 @@ def Booking(request,pk,year,month,day,hour):
     else:
         return render(request, 'booking/booking.html', context)
 
-class StaffListView(generic.ListView):
-    template_name = 'booking/staff.html'
-    model = Studio
+class StaffStudioCalendar(StaffOnly,StudioCalendar):
+    template_name = 'booking/staffcalendar.html'
 
-class StaffStudioCalendar(StudioCalendar):
-    template_name = 'booking/calendar.html'
+class Detail(StaffOnly,generic.TemplateView):
+    template_name = 'booking/detail.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
+        studio = get_object_or_404(Studio, pk=self.kwargs['pk'])
+        year = self.kwargs.get('year')
+        month = self.kwargs.get('month')
+        day = self.kwargs.get('day')
+        date = datetime.date(year=year, month=month, day=day)
+
+        calendar = {}
+        for time in range(9,24):
+            calendar[time] = []
+
+        start_time = datetime.datetime.combine(date, datetime.time(hour=9, minute=0, second=0))
+        end_time = datetime.datetime.combine(date, datetime.time(hour=23, minute=0, second=0))
+        for schedule in Schedule.objects.filter(studio=studio).exclude(Q(start__gt=end_time) | Q(end__lt=start_time)):
+            start_dt = timezone.localtime(schedule.start)
+            end_dt = timezone.localtime(schedule.end)
+            booking_start_hour = start_dt.hour
+            booking_end_hour = end_dt.hour 
+
+            for hour in range(booking_start_hour,booking_end_hour):
+                calendar[hour].append(schedule)
+
+        context = { 'studio'  :studio,
+                    'year'    :year,
+                    'month'   :month,
+                    'day'     :day,
+                    'calendar':calendar}
+        return context

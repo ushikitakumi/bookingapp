@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ studio.name }}</h1>
+    <h1>{{ year }}年{{ month }}月{{ day }}日</h1>
+    <table class="table table-bordered text-center" style="table-layout: fixed;width: 100%" >
+        <tr>
+            <td>時間帯</td>
+            <td>予約</td>
+            <td>氏名</td>
+            <td>電話番号</td>
+            <td>人数</td>
+        </tr>
+        {% for time, schedules in calendar.items %}
+            <tr>
+                <td>{{ time }}:00</td>
+                {% if schedules %}
+                    {% for schedule in schedules%}
+                        <td>有り</td>
+                        <td>{{ schedule.user.last_name }} {{ schedule.user.first_name }}</td>
+                        <td>{{ schedule.user.phone_number }}</td>
+                        <td>{{ schedule.personCount }}</td>
+                    {% endfor %}
+                {% else %}
+                    <td>無し</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

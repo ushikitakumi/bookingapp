@@ -4,11 +4,23 @@
 <html>
 <head></head>
 <body>
+
+{% if user.is_staff %}
+<h1>管理者用</h1>
+{% for studio in object_list %}
+<li><a href="{% url 'booking:staffcalendar' studio.pk %}">{{ studio.name }}</a></li>    
+{% empty %}
+<li>まだスタジオがありません</li>        
+{% endfor %}
+
+{% else %}
 {% for studio in object_list %}
 <li><a href="{% url 'booking:calendar' studio.pk %}">{{ studio.name }}</a></li>    
 {% empty %}
 <li>まだスタジオがありません</li>        
 {% endfor %}
+{% endif %}
+
 </body>
 </html>
 {% endblock %}
