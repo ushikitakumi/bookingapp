@@ -11,6 +11,7 @@ from .models import Studio, Schedule
 import sys
 sys.path.append('../')
 from accounts.models import User
+# from .forms import ScheduleForm
 
 class IndexListView(generic.ListView):
     template_name = 'booking/index.html'
@@ -41,14 +42,14 @@ class StudioCalendar(generic.TemplateView):
 
         # 9時から24時、1週間分の、値がTrueなカレンダーを作る
         calendar = {}
-        for time in range(9,24):
+        for time in range(10,24):
             row = {}
             for day in days:
                 row[day] = True
             calendar[time] = row
         
         # カレンダー表示する最初と最後の日時の間にある予約を取得する
-        start_time = datetime.datetime.combine(start_day, datetime.time(hour=9, minute=0, second=0))
+        start_time = datetime.datetime.combine(start_day, datetime.time(hour=10, minute=0, second=0))
         end_time = datetime.datetime.combine(end_day, datetime.time(hour=23, minute=0, second=0))
         for schedule in Schedule.objects.filter(studio=studio).exclude(Q(start__gt=end_time) | Q(end__lt=start_time)):
             start_dt = timezone.localtime(schedule.start)
@@ -70,6 +71,45 @@ class StudioCalendar(generic.TemplateView):
         context['next'] = days[-1] + datetime.timedelta(days=1)
         context['today'] = today
         return context
+
+# class Booking(LoginRequiredMixin,generic.CreateView):
+#     model = Schedule
+#     # fields = ('start','end','personCount')
+#     template_name = 'booking/booking.html'
+#     form_class = ScheduleForm
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['studio'] = get_object_or_404(Studio,pk=self.kwargs['pk'])
+#         context['user'] = self.request.user
+#         context['year'] = self.kwargs.get('year')
+#         context['month'] = self.kwargs.get('month')
+#         context['day'] = self.kwargs.get('day')
+#         context['hour'] = self.kwargs.get('hour')
+#         return context
+
+#     def form_valid(self, form):
+#         user = self.request.user
+#         studio = get_object_or_404(Studio,pk=self.kwargs['pk'])
+#         start = form.cleaned_data["start"]
+#         end = form.cleaned_data["end"]
+#         personCount = form.cleaned_data["personCount"]
+#         year = self.kwargs.get('year')
+#         month = self.kwargs.get('month')
+#         day = self.kwargs.get('day')
+
+#         if Schedule.objects.filter(studio=studio).exclude(Q(start__gte=end) | Q(end__lte=start)).exists():
+#             messages.error(self.request, 'すでに予約が入っています。別の日時をお選びください')
+#         else:
+#             schedule = form.save(commit=False)
+#             schedule.user = user
+#             schedule.studio = studio
+#             schedule.save()
+#         return redirect('booking:calendar', pk=studio.pk, year=year, month=month, day=day)
+
+        
+
+        
 
 @login_required
 def Booking(request,pk,year,month,day,hour):
@@ -117,10 +157,10 @@ class Detail(StaffOnly,generic.TemplateView):
         date = datetime.date(year=year, month=month, day=day)
 
         calendar = {}
-        for time in range(9,24):
+        for time in range(10,24):
             calendar[time] = []
 
-        start_time = datetime.datetime.combine(date, datetime.time(hour=9, minute=0, second=0))
+        start_time = datetime.datetime.combine(date, datetime.time(hour=10, minute=0, second=0))
         end_time = datetime.datetime.combine(date, datetime.time(hour=23, minute=0, second=0))
         for schedule in Schedule.objects.filter(studio=studio).exclude(Q(start__gt=end_time) | Q(end__lt=start_time)):
             start_dt = timezone.localtime(schedule.start)

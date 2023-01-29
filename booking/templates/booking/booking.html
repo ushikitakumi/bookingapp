@@ -9,9 +9,9 @@
         {% csrf_token %}
         <div>
         <label for="start">開始時刻</label>
-        <input type="time" list="start-list" name="start" min="9:00" max="23:00" step="3600"><span></span>
+        <input type="time" list="start-list" name="start" min="9:00" max="23:00" step="3600" value="{{ hour }}:00"><span></span>
         <datalist id="start-list">
-            <option value="09:00"></option>
+            <!-- <option value="09:00"></option> -->
             <option value="10:00"></option>
             <option value="11:00"></option>
             <option value="12:00"></option>
@@ -32,7 +32,7 @@
         <label for="end">終了時刻</label>
         <input type="time" list="end-list" name="end" min="10:00" max="24:00" step="3600"><span></span>
         <datalist id="end-list">
-            <option value="10:00"></option>
+            <!-- <option value="10:00"></option> -->
             <option value="11:00"></option>
             <option value="12:00"></option>
             <option value="13:00"></option>
