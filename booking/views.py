@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
 from django.views import generic
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin, StaffOnly
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from .models import Studio, Schedule
 import sys
@@ -42,7 +42,7 @@ class StudioCalendar(generic.TemplateView):
 
         # 9時から24時、1週間分の、値がTrueなカレンダーを作る
         calendar = {}
-        for time in range(10,24):
+        for time in range(9*60,26*60,30):
             row = {}
             for day in days:
                 row[day] = True
@@ -50,15 +50,26 @@ class StudioCalendar(generic.TemplateView):
         
         # カレンダー表示する最初と最後の日時の間にある予約を取得する
         start_time = datetime.datetime.combine(start_day, datetime.time(hour=10, minute=0, second=0))
-        end_time = datetime.datetime.combine(end_day, datetime.time(hour=23, minute=0, second=0))
+        end_time = datetime.datetime.combine(end_day+datetime.timedelta(days=1), datetime.time(hour=2, minute=0, second=0))
         for schedule in Schedule.objects.filter(studio=studio).exclude(Q(start__gt=end_time) | Q(end__lt=start_time)):
             start_dt = timezone.localtime(schedule.start)
             end_dt = timezone.localtime(schedule.end)
-            booking_date = start_dt.date()
+            # booking_date = start_dt.date()
             booking_start_hour = start_dt.hour
-            booking_end_hour = end_dt.hour 
+            if booking_start_hour < 2:
+                booking_start_hour += 24
+            booking_start_minute = start_dt.minute
 
-            for hour in range(booking_start_hour,booking_end_hour):
+            booking_end_hour = end_dt.hour 
+            if booking_end_hour < 2:
+                booking_end_hour += 24
+            booking_end_minute = end_dt.minute
+
+            booking_date = start_dt.date()
+            if booking_start_hour >= 24:
+                booking_date -= datetime.timedelta(days=1)
+
+            for hour in range(booking_start_hour*60+booking_start_minute,booking_end_hour*60+booking_end_minute,30):
                 if hour in calendar and booking_date in calendar[hour]:
                     calendar[hour][booking_date] = False
                 
@@ -141,10 +152,10 @@ def Booking(request,pk,year,month,day,hour):
     else:
         return render(request, 'booking/booking.html', context)
 
-class StaffStudioCalendar(StaffOnly,StudioCalendar):
+class StaffStudioCalendar(StudioCalendar):
     template_name = 'booking/staffcalendar.html'
 
-class Detail(StaffOnly,generic.TemplateView):
+class Detail(generic.TemplateView):
     template_name = 'booking/detail.html'
     
     def get_context_data(self, **kwargs):
@@ -157,7 +168,7 @@ class Detail(StaffOnly,generic.TemplateView):
         date = datetime.date(year=year, month=month, day=day)
 
         calendar = {}
-        for time in range(10,24):
+        for time in range(9,24):
             calendar[time] = []
 
         start_time = datetime.datetime.combine(date, datetime.time(hour=10, minute=0, second=0))
