@@ -40,38 +40,55 @@ class StudioCalendar(generic.TemplateView):
         start_day = days[0]
         end_day = days[-1]
 
-        # 9時から24時、1週間分の、値がTrueなカレンダーを作る
+        # 9:00~26:00、1週間分の、値がTrueなカレンダーを作る
+        # "9:00"~"23:30","0:00"~"1:30"の配列
+        time = []
+        for i in range(9, 24):
+            for j in range(0, 60, 30):
+                hour = str(i).zfill(2)
+                minute = str(j).zfill(2)
+                time.append(hour + ":" + minute)
+
+        for i in range(2):
+            for j in range(0, 60, 30):
+                hour = str(i).zfill(2)
+                minute = str(j).zfill(2)
+                time.append(hour + ":" + minute)
+
+        # calendar = {}
+        # for time in range(9*60,26*60,30):
+        #     row = {}
+        #     for day in days:
+        #         row[day] = True
+        #     calendar[time] = row
+
         calendar = {}
-        for time in range(9*60,26*60,30):
+        for count in range(34):
             row = {}
             for day in days:
                 row[day] = True
-            calendar[time] = row
+            calendar[time[count]] = row
         
         # カレンダー表示する最初と最後の日時の間にある予約を取得する
-        start_time = datetime.datetime.combine(start_day, datetime.time(hour=10, minute=0, second=0))
+        start_time = datetime.datetime.combine(start_day, datetime.time(hour=9, minute=0, second=0))
         end_time = datetime.datetime.combine(end_day+datetime.timedelta(days=1), datetime.time(hour=2, minute=0, second=0))
         for schedule in Schedule.objects.filter(studio=studio).exclude(Q(start__gt=end_time) | Q(end__lt=start_time)):
             start_dt = timezone.localtime(schedule.start)
             end_dt = timezone.localtime(schedule.end)
             # booking_date = start_dt.date()
             booking_start_hour = start_dt.hour
-            if booking_start_hour < 2:
-                booking_start_hour += 24
-            booking_start_minute = start_dt.minute
-
-            booking_end_hour = end_dt.hour 
-            if booking_end_hour < 2:
-                booking_end_hour += 24
-            booking_end_minute = end_dt.minute
-
             booking_date = start_dt.date()
             if booking_start_hour >= 24:
                 booking_date -= datetime.timedelta(days=1)
 
-            for hour in range(booking_start_hour*60+booking_start_minute,booking_end_hour*60+booking_end_minute,30):
-                if hour in calendar and booking_date in calendar[hour]:
-                    calendar[hour][booking_date] = False
+            # for hour in range(1):
+            #     if hour in calendar and booking_date in calendar[hour]:
+            #         calendar[hour][booking_date] = False
+            num_start_hour = time.index(start_dt.time().strftime("%H:%M"))
+            num_end_hour = time.index(end_dt.time().strftime("%H:%M")) 
+            for num in range(num_start_hour,num_end_hour):
+                if time[num] in calendar and booking_date in calendar[time[num]]:
+                    calendar[time[num]][booking_date] = False
                 
         context['studio'] = studio
         context['calendar'] = calendar
@@ -134,8 +151,10 @@ def Booking(request,pk,year,month,day,hour):
                 'hour' : hour}
 
     if request.method == 'POST':
-        start_time = datetime.datetime(year=year, month=month, day=day, hour=int(request.POST['start'].replace(':00','')))
-        end_time = datetime.datetime(year=year, month=month, day=day, hour=int(request.POST['end'].replace(':00','')))
+        # start_time = datetime.datetime(year=year, month=month, day=day, hour=int(request.POST['start'].replace(':00','')))
+        start_time = datetime.datetime.strptime(request.POST['start'],'%Y/%m/%d %H:%M')
+        # end_time = datetime.datetime(year=year, month=month, day=day, hour=int(request.POST['end'].replace(':00','')))
+        end_time = datetime.datetime.strptime(request.POST['end'],'%Y/%m/%d %H:%M')
 
         if Schedule.objects.filter(studio=studio).exclude(Q(start__gte=end_time) | Q(end__lte=start_time)).exists():
             messages.error(request, 'すでに予約が入っています。別の日時をお選びください')

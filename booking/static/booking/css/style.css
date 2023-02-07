@@ -9,3 +9,6 @@ main {
 .datepicker-days td:last-child {
   color: #00f;
 }
+.form-control {
+  border-radius: 5px;
+}
