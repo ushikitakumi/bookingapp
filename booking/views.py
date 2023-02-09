@@ -11,7 +11,6 @@ from .models import Studio, Schedule
 import sys
 sys.path.append('../')
 from accounts.models import User
-# from .forms import ScheduleForm
 
 class IndexListView(generic.ListView):
     template_name = 'booking/index.html'
@@ -48,20 +47,13 @@ class StudioCalendar(generic.TemplateView):
                 hour = str(i).zfill(2)
                 minute = str(j).zfill(2)
                 time.append(hour + ":" + minute)
-
         for i in range(2):
             for j in range(0, 60, 30):
                 hour = str(i).zfill(2)
                 minute = str(j).zfill(2)
                 time.append(hour + ":" + minute)
 
-        # calendar = {}
-        # for time in range(9*60,26*60,30):
-        #     row = {}
-        #     for day in days:
-        #         row[day] = True
-        #     calendar[time] = row
-
+        #カレンダーの配列
         calendar = {}
         for count in range(34):
             row = {}
@@ -75,15 +67,11 @@ class StudioCalendar(generic.TemplateView):
         for schedule in Schedule.objects.filter(studio=studio).exclude(Q(start__gt=end_time) | Q(end__lt=start_time)):
             start_dt = timezone.localtime(schedule.start)
             end_dt = timezone.localtime(schedule.end)
-            # booking_date = start_dt.date()
             booking_start_hour = start_dt.hour
             booking_date = start_dt.date()
-            if booking_start_hour >= 24:
+            if booking_start_hour <= 2:
                 booking_date -= datetime.timedelta(days=1)
 
-            # for hour in range(1):
-            #     if hour in calendar and booking_date in calendar[hour]:
-            #         calendar[hour][booking_date] = False
             num_start_hour = time.index(start_dt.time().strftime("%H:%M"))
             num_end_hour = time.index(end_dt.time().strftime("%H:%M")) 
             for num in range(num_start_hour,num_end_hour):
@@ -98,51 +86,16 @@ class StudioCalendar(generic.TemplateView):
         context['before'] = days[0] - datetime.timedelta(days=7)
         context['next'] = days[-1] + datetime.timedelta(days=1)
         context['today'] = today
-        return context
-
-# class Booking(LoginRequiredMixin,generic.CreateView):
-#     model = Schedule
-#     # fields = ('start','end','personCount')
-#     template_name = 'booking/booking.html'
-#     form_class = ScheduleForm
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['studio'] = get_object_or_404(Studio,pk=self.kwargs['pk'])
-#         context['user'] = self.request.user
-#         context['year'] = self.kwargs.get('year')
-#         context['month'] = self.kwargs.get('month')
-#         context['day'] = self.kwargs.get('day')
-#         context['hour'] = self.kwargs.get('hour')
-#         return context
-
-#     def form_valid(self, form):
-#         user = self.request.user
-#         studio = get_object_or_404(Studio,pk=self.kwargs['pk'])
-#         start = form.cleaned_data["start"]
-#         end = form.cleaned_data["end"]
-#         personCount = form.cleaned_data["personCount"]
-#         year = self.kwargs.get('year')
-#         month = self.kwargs.get('month')
-#         day = self.kwargs.get('day')
-
-#         if Schedule.objects.filter(studio=studio).exclude(Q(start__gte=end) | Q(end__lte=start)).exists():
-#             messages.error(self.request, 'すでに予約が入っています。別の日時をお選びください')
-#         else:
-#             schedule = form.save(commit=False)
-#             schedule.user = user
-#             schedule.studio = studio
-#             schedule.save()
-#         return redirect('booking:calendar', pk=studio.pk, year=year, month=month, day=day)
-
-        
-
-        
+        return context      
 
 @login_required
 def Booking(request,pk,year,month,day,hour):
     studio = get_object_or_404(Studio, pk=pk)
     user = get_object_or_404(User, pk=request.user.id)
+    # 予約の開始時刻が0:00~1:30であれば日付を+1する
+    if hour == ("00:00" or "00:30" or "01:00" or "01:30"):
+        day += 1
+
     context = {'studio': studio,
                 'user' : user,
                 'year' : year,
@@ -151,9 +104,7 @@ def Booking(request,pk,year,month,day,hour):
                 'hour' : hour}
 
     if request.method == 'POST':
-        # start_time = datetime.datetime(year=year, month=month, day=day, hour=int(request.POST['start'].replace(':00','')))
         start_time = datetime.datetime.strptime(request.POST['start'],'%Y/%m/%d %H:%M')
-        # end_time = datetime.datetime(year=year, month=month, day=day, hour=int(request.POST['end'].replace(':00','')))
         end_time = datetime.datetime.strptime(request.POST['end'],'%Y/%m/%d %H:%M')
 
         if Schedule.objects.filter(studio=studio).exclude(Q(start__gte=end_time) | Q(end__lte=start_time)).exists():
