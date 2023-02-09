@@ -1,4 +1,4 @@
-import datetime
+import datetime, time
 from django.conf import settings
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, render, redirect
@@ -96,12 +96,20 @@ def Booking(request,pk,year,month,day,hour):
     if hour == ("00:00" or "00:30" or "01:00" or "01:30"):
         day += 1
 
+    # 開始時刻をdatetime型で取得
+    start = datetime.datetime.strptime(hour,'%H:%M').replace(year=year,month=month,day=day)
+    # 終了時刻の初期値は基本1時間後(もし予約開始が01:30なら最終時刻の02:00が終了時刻)
+    if hour == "01:30":
+        end = start + datetime.timedelta(minutes=30)
+    else:
+        end = start + datetime.timedelta(hours=1)
+    start_str = start.strftime('%Y%m%d %H:%M')
+    end_str = end.strftime('%Y%m%d %H:%M')
+    
     context = {'studio': studio,
                 'user' : user,
-                'year' : year,
-                'month': month,
-                'day'  : day,
-                'hour' : hour}
+                'start': start_str,
+                'end'  : end_str,}
 
     if request.method == 'POST':
         start_time = datetime.datetime.strptime(request.POST['start'],'%Y/%m/%d %H:%M')

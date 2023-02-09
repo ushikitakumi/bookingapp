@@ -11,14 +11,14 @@
           {% csrf_token %}
           <div class="input-group date mb-3" id="ReserveStartDateTime" data-target-input="nearest">
             <label for="ReserveStartDateTime" class="pt-2 pr-2">開始：</label>
-            <input type="text" class="form-control datetimepicker-input" name="start" data-target="#ReserveStartDateTime"  value="{{ year }}/{{ month }}/{{ day }} {{ hour }}"/>
+            <input type="text" class="form-control datetimepicker-input" name="start" data-target="#ReserveStartDateTime"  value="{{ start }}"/>
             <div class="input-group-text" data-target="#ReserveStartDateTime" data-toggle="datetimepicker">
               <i class="far fa-calendar-alt"></i>
             </div>
           </div>
           <div class="input-group date mb-3" id="ReserveEndDateTime" data-target-input="nearest">
             <label for="datetimepicker3" class="pt-2 pr-2">終了：</label>
-            <input type="text" class="form-control datetimepicker-input" name="end" data-target="#ReserveEndDateTime" value="{{ year }}/{{ month }}/{{ day }} {{ hour }}"/>
+            <input type="text" class="form-control datetimepicker-input" name="end" data-target="#ReserveEndDateTime" value="{{ end }}"/>
             <div class="input-group-text" data-target="#ReserveEndDateTime" data-toggle="datetimepicker">
               <i class="far fa-calendar-alt"></i>
             </div>
