@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+    <form method="POST" class="p-4">
+        {% csrf_token %}
+        <label class="pt-2 pr-2">予約者氏名：</label>
+        <p>{{ user.last_name }} {{ user.first_name }}</p>
+        <label class="pt-2 pr-2">スタジオ：</label>
+        <p>{{ studio.name }}</p>
+        <label class="pt-2 pr-2">予約開始時刻：</label>
+        <p>{{ start }}</p>
+        <label class="pt-2 pr-2">予約終了時刻：</label>
+        <p>{{ end }}</p>
+        <label class="pt-2 pr-2">利用人数：</label>
+        <p>{{ personCount }}</p>
+        <button type="submit" class="btn btn-success">予約確定</button>
+    </form>
+{% endblock %}

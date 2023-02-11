@@ -20,6 +20,7 @@ $(function() {
       format: 'YYYY/MM/DD HH:mm',
       stepping: 30,
       locale: 'ja',
+      ignoreReadonly: true,
       icons: {
         time: 'far fa-clock',
         date: 'far fa-calendar-alt',
@@ -30,6 +31,7 @@ $(function() {
         showClose: true,
       },
     });
+
     $("#ReserveStartDateTime").click(function() {
       $('#ReserveStartDateTime').data("DateTimePicker").show();
       $('#ReserveStartDateTime .bootstrap-datetimepicker-widget li.picker-switch td a').click();

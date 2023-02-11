@@ -115,20 +115,57 @@ def Booking(request,pk,year,month,day,hour):
         start_time = datetime.datetime.strptime(request.POST['start'],'%Y/%m/%d %H:%M')
         end_time = datetime.datetime.strptime(request.POST['end'],'%Y/%m/%d %H:%M')
 
+        # if Schedule.objects.filter(studio=studio).exclude(Q(start__gte=end_time) | Q(end__lte=start_time)).exists():
+        #     messages.error(request, 'すでに予約が入っています。別の日時をお選びください')
+        # else:
+        #     object = Schedule.objects.create(
+        #             start = start_time,
+        #             end = end_time,
+        #             personCount = request.POST['personCount'],
+        #             user = user,
+        #             studio = studio)
+        #     object.save()
+        # return redirect('booking:calendar', pk=studio.pk, year=year, month=month, day=day)
+
         if Schedule.objects.filter(studio=studio).exclude(Q(start__gte=end_time) | Q(end__lte=start_time)).exists():
             messages.error(request, 'すでに予約が入っています。別の日時をお選びください')
+            return redirect('booking:calendar', pk=studio.pk, year=year, month=month, day=day)
         else:
-            object = Schedule.objects.create(
-                    start = start_time,
-                    end = end_time,
-                    personCount = request.POST['personCount'],
-                    user = user,
-                    studio = studio)
-            object.save()
-        return redirect('booking:calendar', pk=studio.pk, year=year, month=month, day=day)
+            studio = studio
+            personCount = request.POST['personCount']
+            start_str = request.POST['start'].replace('/','-')
+            end_str = request.POST['end'].replace('/','-')
 
+            return redirect('booking:confirm', pk=studio.pk, personCount=personCount, start_str=start_str, end_str=end_str)
     else:
         return render(request, 'booking/booking.html', context)
+
+@login_required
+def Confirm(request,pk,personCount,start_str,end_str):
+    studio = get_object_or_404(Studio, pk=pk)
+    user = get_object_or_404(User, pk=request.user.id)
+    start_str = start_str.replace('-','/')
+    end_str = end_str.replace('-','/')
+
+    context = {'studio': studio,
+               'user' : user,
+               'personCount' : personCount,
+               'start': start_str,
+               'end'  : end_str,}
+
+    if request.method == "POST":
+        object = Schedule.objects.create(
+            studio = studio,
+            user = user,
+            personCount = personCount,
+            start = datetime.datetime.strptime(start_str,'%Y/%m/%d %H:%M'),
+            end = datetime.datetime.strptime(end_str,'%Y/%m/%d %H:%M'),
+        )
+        object.save()
+        return redirect('booking:index')
+
+    else:
+        return render(request, 'booking/confirm.html', context)
 
 class StaffStudioCalendar(StudioCalendar):
     template_name = 'booking/staffcalendar.html'

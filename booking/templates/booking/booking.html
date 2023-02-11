@@ -3,7 +3,7 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-    <h1>{{ studio.name }}</h1>
+    <h2>予約時間確認</h2>
 
     <div class="container">
       <div class="col-md-3 py-4">
@@ -11,7 +11,7 @@
           {% csrf_token %}
           <div class="input-group date mb-3" id="ReserveStartDateTime" data-target-input="nearest">
             <label for="ReserveStartDateTime" class="pt-2 pr-2">開始：</label>
-            <input type="text" class="form-control datetimepicker-input" name="start" data-target="#ReserveStartDateTime"  value="{{ start }}"/>
+            <input type="text" class="form-control datetimepicker-input" name="start" data-target="#ReserveStartDateTime" value="{{ start }}" readonly="readonly" />
             <div class="input-group-text" data-target="#ReserveStartDateTime" data-toggle="datetimepicker">
               <i class="far fa-calendar-alt"></i>
             </div>
@@ -25,9 +25,20 @@
           </div>
           <div class="input-group mb-3">
             <label for="personCount" class="pt-2 pr-2">人数：</label>
-            <input type="number" class="form-control" name="personCount">
+            <select class="form-control" name="personCount">
+              <option value="1">1人</option>
+              <option value="2">2人</option>
+              <option value="3">3人</option>
+              <option value="4">4人</option>
+              <option value="5">5人</option>
+              <option value="6">6人</option>
+              <option value="7">7人</option>
+              <option value="8">8人</option>
+              <option value="9">9人</option>
+              <option value="10">10人</option>
+            </select>
           </div>
-          <input type="submit"></button>
+          <button type="submit" class="btn btn-success">予約情報の詳細に移る</button>
         </form>
       </div>
       <script src="{% static 'booking/js/script.js' %}"></script>
