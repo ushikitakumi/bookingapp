@@ -24,13 +24,11 @@
         {% for time, schedules in calendar.items %}
             <tr style="font-size:12px">
                 <td>
-                    {{ time }}:00~
+                    {{ time }}~
                 </td>
                 {% for dt, book in schedules.items %}
                     <td>
-                        {% if dt <= today %}
-                            -
-                        {% elif book %}
+                        {% if book %}
                             ○
                         {% else %}
                             ×
@@ -39,7 +37,7 @@
 
                 {% endfor %}
                 <td>
-                    {{ time }}:00~
+                    {{ time }}~
                 </td>
             </tr>
         {% endfor %}

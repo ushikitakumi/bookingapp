@@ -13,7 +13,7 @@
         </tr>
         {% for time, schedules in calendar.items %}
             <tr>
-                <td>{{ time }}:00</td>
+                <td>{{ time }}</td>
                 {% if schedules %}
                     {% for schedule in schedules%}
                         <td>有り</td>

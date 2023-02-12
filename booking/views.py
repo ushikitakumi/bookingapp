@@ -182,20 +182,36 @@ class Detail(generic.TemplateView):
         day = self.kwargs.get('day')
         date = datetime.date(year=year, month=month, day=day)
 
+        # 9:00~26:00、1週間分の、値がTrueなカレンダーを作る
+        # "9:00"~"23:30","0:00"~"1:30"の配列
+        time = []
+        for i in range(9, 24):
+            for j in range(0, 60, 30):
+                hour = str(i).zfill(2)
+                minute = str(j).zfill(2)
+                time.append(hour + ":" + minute)
+        for i in range(2):
+            for j in range(0, 60, 30):
+                hour = str(i).zfill(2)
+                minute = str(j).zfill(2)
+                time.append(hour + ":" + minute)
         calendar = {}
-        for time in range(9,24):
-            calendar[time] = []
+        for count in range(34):
+            calendar[time[count]] = []
 
-        start_time = datetime.datetime.combine(date, datetime.time(hour=10, minute=0, second=0))
-        end_time = datetime.datetime.combine(date, datetime.time(hour=23, minute=0, second=0))
+        start_time = datetime.datetime.combine(date, datetime.time(hour=9, minute=0, second=0))
+        end_time = datetime.datetime.combine(date+datetime.timedelta(days=1), datetime.time(hour=2, minute=0, second=0))
         for schedule in Schedule.objects.filter(studio=studio).exclude(Q(start__gt=end_time) | Q(end__lt=start_time)):
             start_dt = timezone.localtime(schedule.start)
             end_dt = timezone.localtime(schedule.end)
-            booking_start_hour = start_dt.hour
-            booking_end_hour = end_dt.hour 
 
-            for hour in range(booking_start_hour,booking_end_hour):
-                calendar[hour].append(schedule)
+            num_start_hour = time.index(start_dt.time().strftime("%H:%M"))
+            num_end_hour = time.index(end_dt.time().strftime("%H:%M")) 
+
+            for num in range(num_start_hour,num_end_hour):
+                calendar[time[num]].append(schedule)
+            # for hour in range(booking_start_hour,booking_end_hour):
+            #     calendar[hour].append(schedule)
 
         context = { 'studio'  :studio,
                     'year'    :year,
