@@ -3,8 +3,8 @@
 {% block content %}
 
     <h1>管理者用</h1>
-    <h1>{{ studio.name }}</h1>
-    <p>{{ start_day }} - {{ end_day }}</p>
+    <h1 style="text-align: center;">{{ studio.name }}</h1>
+    <p  style="text-align: center;">{{ start_day }} - {{ end_day }}</p>
     <table class="table table-bordered text-center" style="table-layout: fixed;width: 100%">
         <tr>
             <td style="vertical-align:middle;"><a href="{% url 'booking:staffcalendar' studio.pk before.year before.month before.day %}">前週</a></td>

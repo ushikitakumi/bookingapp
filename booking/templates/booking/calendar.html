@@ -2,8 +2,8 @@
 
 {% block content %}
 
-    <h1>{{ studio.name }} 予約可能時間↓</h1>
-    <p>{{ start_day }} - {{ end_day }}</p>
+    <h1 style="text-align: center;">{{ studio.name }} 予約可能時間</h1>
+    <p  style="text-align: center;">{{ start_day }} - {{ end_day }}</p>
     <table class="table table-bordered text-center" style="table-layout: fixed;width: 100%">
         <tr>
             <td><a href="{% url 'booking:calendar' studio.pk before.year before.month before.day %}">前週</a></td>

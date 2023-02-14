@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<html>
-<head></head>
-<body>
 
 {% if user.is_staff %}
 <h1>管理者用</h1>
@@ -21,6 +18,4 @@
 {% endfor %}
 {% endif %}
 
-</body>
-</html>
 {% endblock %}
