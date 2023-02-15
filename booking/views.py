@@ -1,4 +1,4 @@
-import datetime, time
+import datetime
 from django.conf import settings
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, render, redirect

@@ -25,6 +25,7 @@
             <a href="/" class="navbar-brand">予約管理システム</a>
             <ul class="navbar-nav mr-md-2">
                 {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'mypage' %}">マイページ</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">ログアウト</a></li>
                 {% else %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">ログイン</a></li>
