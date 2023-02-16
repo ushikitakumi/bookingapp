@@ -16,5 +16,5 @@ urlpatterns = [
     ), name='login'),
     path('logout/',LogoutView.as_view(), name='logout'),
     
-    path('mypage/',views.MypageView,name='mypage'),
+    path('mypage/',views.MypageView.as_view(),name='mypage'),
 ]

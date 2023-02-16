@@ -1,6 +1,83 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1 style="text-align: center;">マイページ</h1>
-    
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center title">
+                <h1>マイページ</h1>
+            </div>
+            <div class="col-12 mt-3 text-center content">
+                <div class="cardgray">
+                    <h3>登録情報</h3>
+                    <div>
+                        <label><strong>氏名</strong></label>
+                        <p style="display: inline;">{{ user.last_name }} {{ user.first_name }}</p>
+                    </div>
+                    <div>
+                        <label><strong>メールアドレス</strong></label>
+                        <p style="display: inline;">{{ user.email }}</p>
+                    </div>
+                    <div>
+                        <label><strong>電話番号</strong></label>
+                        <p style="display: inline;">{{ user.phone_number }}</p>
+                    </div>
+                </div>
+                <div class="col-12 mt-3 text-center mx-auto cardgray">
+                    <h3>予約一覧</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">スタジオ名</th>
+                                <th scope="col">開始時刻</th>
+                                <th scope="col">終了時刻</th>
+                                <th scope="col">人数</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for schedule in reserve_schedule %}
+                            <tr>
+                                <td>{{ schedule.studio }}</td>
+                                <td>{{ schedule.start }}</td>
+                                <td>{{ schedule.end }}</td>
+                                <td>{{ schedule.personCount }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">現在予約はありません。</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-12 mt-3 text-center mx-auto cardgray">
+                    <h3>過去一ヶ月の利用履歴</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">スタジオ名</th>
+                                <th scope="col">開始時刻</th>
+                                <th scope="col">終了時刻</th>
+                                <th scope="col">人数</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for schedule in history_schedule %}
+                            <tr>
+                                <td>{{ schedule.studio }}</td>
+                                <td>{{ schedule.start }}</td>
+                                <td>{{ schedule.end }}</td>
+                                <td>{{ schedule.personCount }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">まだ利用していません</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
