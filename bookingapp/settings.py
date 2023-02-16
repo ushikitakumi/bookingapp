@@ -50,8 +50,6 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
 
     'django_bootstrap5',
-    # 'bootstrap4',
-    # 'bootstrap_datepicker_plus',
 ]
 
 MIDDLEWARE = [
