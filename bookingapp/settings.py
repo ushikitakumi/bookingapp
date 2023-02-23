@@ -136,6 +136,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = '/usr/share/nginx/html/static'
+
 # BOOTSTRAP4 = {
 #     'include_jquery': True,
 # }
